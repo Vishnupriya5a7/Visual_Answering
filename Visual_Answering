@@ -1,0 +1,20 @@
+# Use a pipeline as a high-level helper
+from transformers import pipeline
+
+pipe = pipeline("visual-question-answering", model="Salesforce/blip-vqa-base")
+
+import requests
+from PIL import Image
+from transformers import BlipProcessor, BlipForQuestionAnswering
+
+processor = BlipProcessor.from_pretrained("Salesforce/blip-vqa-base")
+model = BlipForQuestionAnswering.from_pretrained("Salesforce/blip-vqa-base")
+
+img_url = 'https://ilearnnearn.files.wordpress.com/2013/05/happy-child.jpg'
+raw_image = Image.open(requests.get(img_url, stream=True).raw).convert('RGB')
+
+question = "WHAT IS THE COLOUR OF FLOWERS?"
+inputs = processor(raw_image, question, return_tensors="pt")
+
+out = model.generate(**inputs)
+print(processor.decode(out[0], skip_special_tokens=True))
